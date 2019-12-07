@@ -1,7 +1,8 @@
-import matplotlib.pyplot as plt
+mport matplotlib.pyplot as plt
 import numpy as np
 import random as r
 import math as m
+import os
 
 class Material():
     "Class for a material"
@@ -133,8 +134,11 @@ if __name__ == '__main__':
     draw_graphs = False
     gen_random = 0
     within_limits = True
-
+    the_headers = ["Material", "Average", "Standard Deviation"]
+    newpath = os.path.join(os.getcwd(), "semantic-differential-scales")
     max_min = []
+
+
     max_min.append(only_num("Please enter the minimum rating limit:"))
     max_min.append(only_num("Please enter the maximum rating limit:"))
 
@@ -186,12 +190,27 @@ if __name__ == '__main__':
             num_cols = 1
         else:
             num_cols = m.ceil(len(property_list)/3)
-        plt.subplot(3, num_cols, property_list.index(prprty)+1, aspect = len(material_list)/(float(max_min[1])*2))
-        make_graph(prprty.gen_array(), prprty, max_min)
-        print("Your data for" + str(prprty) + " is ")
+        # plt.subplot(3, num_cols, property_list.index(prprty)+1, aspect = len(material_list)/(float(max_min[1])*2))
+        plot = make_graph(prprty.gen_array(), prprty, max_min)
+
+        newfilename = str(prprty) + "-differential-scales.png"
+        if os.path.exists(newpath):
+            print("semantic-differential-scales found!")
+        else:
+            print("semantic-differential-scales directory not found. Making a new directory...")
+            os.makedirs(newpath)
+            if os.path.exists(newpath):
+                print("Directory successfuly made")
+
+        print("saving a semantic differential scale graph for " + str(prprty) + " as " + newfilename + "...")
+        plt.savefig(os.path.join(newpath, (newfilename)),dpi = 300, bbox_inches ="tight")
+        plt.clf()
+        print("Your data for " + str(prprty) + " is ")
+
         no_headers = np.insert(prprty.gen_array()[0].astype(str), 0, prprty.gen_array()[1], 1 )
-        the_headers = ["Material", "Average", "Standard Deviation"]
+
         print(str(np.insert(no_headers, 0, the_headers, 0)))
+    print("Your graphs have been saved in " + str(newpath))
     print("Your materials are " + str(material_list))
     print("Your properties are " + str(property_list))
-    plt.show()
+    # plt.show()
