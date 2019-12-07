@@ -1,4 +1,9 @@
-# [Unreleased]
+#[Unreleased]
+### Added
+Added functionality to import CSV files to read data.
+
+# V3.0
+## 2019-12-07
 ### Added
 Added functionality to generate CSV files for each plot.
 ### Changed
