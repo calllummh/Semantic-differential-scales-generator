@@ -8,6 +8,8 @@ Added functionality to import CSV files to read data.
 Added functionality to generate CSV files for each plot.
 ### Changed
 Changed functionality of file path generation within code to use a FilePath class.
+### Fixed
+Bug where if a / was included in the property name, python's generation of the .png file would fail due to pathing error.
 
 
 # V2.0
