@@ -2,6 +2,13 @@
 ### Added
 Added functionality to import CSV files to read data.
 
+
+# V3.0
+## 2019-12-07
+# Fixed
+Huge bug in while loop structure causing user to be stuck in an eternal loop.
+
+
 # V3.0
 ## 2019-12-07
 ### Added
