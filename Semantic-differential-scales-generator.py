@@ -3,10 +3,12 @@ import numpy as np
 import random as r
 import math as m
 import os
+import string
 
 class Material():
     "Class for a material"
     def __init__(self, material):
+        "Instantiates a material."
         self.material = material
 
     def __repr__(self):
@@ -14,8 +16,9 @@ class Material():
 
 
 class Property():
-    "Class for a material property"
+    "Class for a material property."
     def __init__(self, name):
+        "Instantiates a property."
         self.name = name
         self.materials = {}
 
@@ -23,18 +26,18 @@ class Property():
         return str(self.name)
 
     def add_a_material(self,material,avg,std_dev):
-        "Adds a material to the materials list for that property"
+        "Adds a material to the materials dictionary for that property. with average, and standard deviation values"
         property_values = PropertyValues(avg,std_dev)
         #updates the materials dictionary with the material and its values.
         self.materials.update( {str(material) : property_values.values() } )
     
     def mat_values(self,material):
-        "returns the materials' values from the materials dictionary"
+        "Returns the materials' values from the materials dictionary."
         return list(self.materials.get(material))
         # return (str(material) + " has the average value " + str(values[0]) + " and a standard deviation of " + str(values[1]) + " for the property " + str(self.name) + "." , values)
     
     def gen_array(self):
-        "Generates the array of data for numpy to make graphs for that property"
+        "Generates the array of data for numpy to make graphs for that property."
         array_list = []
         header_list = []
         #iterates over the materials in the materials list
@@ -55,14 +58,35 @@ class Property():
 class PropertyValues():
     "Class for property values to generate lists on the fly."
     def __init__(self,avg,std_dev):
+        "Instnatiates a property value."
         self.property_values = [avg,std_dev]
         
     def values(self):
         return self.property_values
 
+class FilePath():
+    "Class for generating safe file paths and names."
+    def __init__(self, new_folder_name, file_name):
+        # Makes the file name safe for computer consumption by replacing all punctuation to be a "-"
+        self.safe_file_name = str(new_file_name.replace(string.punctuation, "-"))
+
+        self.new_folder = os.path.join(os.getcwd(), new_folder_name)
+    
+    def safe_file_path(self, file):
+        '''Returns the safe file path with the file'''
+        return str(os.path.join(self.new_folder, file))
+
+    def add_extras(self, file_extension, *extras):
+        '''Adds extra words and a file extension to the safe file name attribute.
+        The method will separate extras with a "-" and add a "." before the file extension.'''
+        extra_file_name = self.safe_file_name
+        for extra in extras:
+            extra_file_name += ( "-" + str(extra))
+        extra_file_name += ("." + str(file_extension))
+        return extra_file_name
 
 def y_or_n(yn):
-    "Default method for answering yes or no to questions."
+    "Default method for answering yes or no to questions. Returns None when user makes a false input."
     if yn == "y":
         return True
     elif yn == "n":
@@ -72,6 +96,7 @@ def y_or_n(yn):
         return None
 
 def y_n_loop(string):
+    "Yes no loop function for resolving conflicts with false y/n input."
     y_n = True
     while y_n:
         print(string)
@@ -125,6 +150,7 @@ def only_num(string):
             print("Please only enter numeric values!")
             only_num = True
 
+
 if __name__ == '__main__':
     material_list = []
     property_list = []
@@ -135,7 +161,6 @@ if __name__ == '__main__':
     gen_random = 0
     within_limits = True
     the_headers = ["Material", "Average", "Standard Deviation"]
-    newpath = os.path.join(os.getcwd(), "semantic-differential-scales")
     max_min = []
 
 
@@ -193,24 +218,30 @@ if __name__ == '__main__':
         # plt.subplot(3, num_cols, property_list.index(prprty)+1, aspect = len(material_list)/(float(max_min[1])*2))
         plot = make_graph(prprty.gen_array(), prprty, max_min)
 
-        newfilename = str(prprty) + "-differential-scales.png"
-        if os.path.exists(newpath):
+        # Makes a new file name based on the string of the property
+        new_file_name = str(prprty) + "-differential-scales"
+        # Makes the file name safe for computer consumption by changing all punctuation to a -
+
+        the_path = FilePath("semantic-differential-scales", prprty)
+        the_file_png = the_path.add_extras("png")
+        the_file_csv = the_path.add_extras("csv","csv","file")
+
+        if os.path.exists(the_path.new_folder):
             print("semantic-differential-scales found!")
         else:
             print("semantic-differential-scales directory not found. Making a new directory...")
-            os.makedirs(newpath)
-            if os.path.exists(newpath):
+            os.makedirs(the_path.new_folder)
+            if os.path.exists(the_path.new_folder):
                 print("Directory successfuly made")
 
-        print("saving a semantic differential scale graph for " + str(prprty) + " as " + newfilename + "...")
-        plt.savefig(os.path.join(newpath, (newfilename)),dpi = 300, bbox_inches ="tight")
+        print("saving a semantic differential scale graph for " + str(prprty) + " as " + the_file_png )
+        plt.savefig(the_path.safe_file_path(the_file_png), dpi = 300, bbox_inches ="tight")
         plt.clf()
-        print("Your data for " + str(prprty) + " is ")
 
         no_headers = np.insert(prprty.gen_array()[0].astype(str), 0, prprty.gen_array()[1], 1 )
 
-        print(str(np.insert(no_headers, 0, the_headers, 0)))
-    print("Your graphs have been saved in " + str(newpath))
+        np.savetxt(the_path.safe_file_path(the_file_csv), np.insert(no_headers, 0, the_headers, 0), fmt="%s", delimiter= ",")
+    print("Your graphs have been saved in " + str())
     print("Your materials are " + str(material_list))
     print("Your properties are " + str(property_list))
     # plt.show()
