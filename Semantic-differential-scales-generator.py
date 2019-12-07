@@ -178,11 +178,13 @@ if __name__ == '__main__':
             gen_random = 1
 
     while adding_materials:
+        #Uses the add_thing function to add Material instances to the material_list
         if add_thing(Material, material_list):
             adding_materials = False
             adding_properties = True
 
     while adding_properties:
+        #Uses the add_thing function to add property instances to the material_list
         if add_thing(Property, property_list):
             adding_properties = False
             adding_values = True
@@ -198,24 +200,31 @@ if __name__ == '__main__':
             else:
                 while within_limits:
                     avg = only_num("Enter a value for average " + str(prprty) + "-ness, of " + str(mat) + ":")
+                    # If the user wants some randomness
                     if gen_random==1:
+                        # Multiplies the avg by a small randomness factor
                         avg *= r.uniform(0.8,1.2)
-
                     std_dev = only_num("Enter a value for standard deviation around " + str(mat) + "'s " + str(prprty) + "-ness:")
+                    # If the user wants some randomness
                     if gen_random ==1:
+                        # Multiplies the avg by a small randomness factor
                         std_dev *= r.uniform(0.8,1.2)
+                    # Checks whether  the average and standard deviation values are within the max and min values.
                     if avg > max_min[1] or avg < max_min[0] or std_dev > max_min[1] or std_dev < max_min[0]:
+                        # Queries a yes or no loop to check whether they want to continue with the out of max_min range values.
                         if y_n_loop("WARNING!!! The values specified for average and standard deviation of " + str(mat) + "'s " + str(prprty) + "-ness are outside of the maximum and minimum values. Do you wish to continue? (y/n)"):
+                            # If they do wish to continue, Breaks the within_limits loop
                             within_limits = False
                         else:
+                            # If they don't want continue, keeps within_limits loop, forcing user to re-enter maerial property values.
                             within_limits = True
+                    else:
+                        # Breaks the within limits loop as they have entered values within the limits of the max_min values.
+                        within_limits = False
+                # Resets the within limits loop to true so that they are queried about material properties for the next material in the list.
+                within_limits = True
                 #adds a material to the property with the avg and std dev values specified
                 prprty.add_a_material(mat,avg,std_dev)
-        if len(property_list) < 3:
-            num_cols = 1
-        else:
-            num_cols = m.ceil(len(property_list)/3)
-        # plt.subplot(3, num_cols, property_list.index(prprty)+1, aspect = len(material_list)/(float(max_min[1])*2))
         plot = make_graph(prprty.gen_array(), prprty, max_min)
 
         # Makes a new file name based on the string of the property
@@ -229,19 +238,21 @@ if __name__ == '__main__':
         if os.path.exists(the_path.new_folder):
             print("semantic-differential-scales found!")
         else:
-            print("semantic-differential-scales directory not found. Making a new directory...")
+            print("semantic-differential-scales directory not found. Making a new directory")
+            print("...")
             os.makedirs(the_path.new_folder)
             if os.path.exists(the_path.new_folder):
                 print("Directory successfuly made")
 
-        print("saving a semantic differential scale graph for " + str(prprty) + " as " + the_file_png )
+        print("Saving a semantic differential scale graph for " + str(prprty) + " as " + the_file_png )
+        print("...")
         plt.savefig(the_path.safe_file_path(the_file_png), dpi = 300, bbox_inches ="tight")
         plt.clf()
 
         no_headers = np.insert(prprty.gen_array()[0].astype(str), 0, prprty.gen_array()[1], 1 )
-
+        print("Saving a CSV file of semantic differential data for " + str(prprty) + " as " + the_file_csv )
+        print("...")
         np.savetxt(the_path.safe_file_path(the_file_csv), np.insert(no_headers, 0, the_headers, 0), fmt="%s", delimiter= ",")
-    print("Your graphs have been saved in " + str())
+        print("Your graph and CSV file have been saved in " + the_path.new_folder)
     print("Your materials are " + str(material_list))
     print("Your properties are " + str(property_list))
-    # plt.show()
