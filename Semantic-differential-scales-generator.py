@@ -67,11 +67,17 @@ class PropertyValues():
 class FilePath():
     "Class for generating safe file paths and names."
     def __init__(self, new_folder_name, file_name):
-        # Makes the file name safe for computer consumption by replacing all punctuation to be a "-"
-        self.safe_file_name = str(new_file_name.replace(string.punctuation, "-"))
+        self.safe_file_name = self.make_name_safe(str(file_name))
 
         self.new_folder = os.path.join(os.getcwd(), new_folder_name)
     
+    def make_name_safe(self,file_name):
+        'Makes the file name safe for computer consumption by replacing all punctuation to be a "-"'
+        for char in file_name: 
+            if char in string.punctuation: 
+                file_name = file_name.replace(char, "-") 
+        return file_name
+
     def safe_file_path(self, file):
         '''Returns the safe file path with the file'''
         return str(os.path.join(self.new_folder, file))
