@@ -2,6 +2,10 @@
 ### Added
 Added functionality to import CSV files to read data.
 
+# V3.2
+## 2019-12-07
+### Fixed
+Functionality in FilePath class to make safe_file_name function correctly.
 
 # V3.1
 ## 2019-12-07
