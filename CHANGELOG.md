@@ -2,6 +2,11 @@
 ### Added
 Added functionality to import CSV files to read data.
 
+# V3.3
+## 2019-12-09
+### Fixed
+Graph now features rotated text to avoid cluttering of the axes.
+
 # V3.2
 ## 2019-12-07
 ### Fixed
