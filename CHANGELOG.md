@@ -7,6 +7,7 @@ Adding functionality to import CSV files to read data.
 ## 2019-12-09
 ### Changed
 Moved make_graph method inside Property class in the interest of optimisation. Results in less parameters required to be passed in, as array data, and name are already contained within the method.
+Moved generation of CSV files inside Property class in the interest of optimisation.
 ### Removed
 Removed mat_values method from Property, as it was obsolte, and was superseded by Property Values class.
 
