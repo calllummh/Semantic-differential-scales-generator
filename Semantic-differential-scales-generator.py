@@ -48,6 +48,25 @@ class Property():
             array_list.append(array_row)
         # Returns a generated array from the array list, and the header list. 
         return np.array(array_list), header_list
+        
+    def make_graph(self,max_min):
+        "Makes an error bar graph based on the array and other parameters supplied."
+        array = self.gen_array()[0]
+        headers = self.gen_array()[1]
+        # Generates a range of x values for each value in first column of the array
+        x = np.arange(1,len(array[:,0])+1)
+        # Assigns y to equal the first column of the first item in the array tuple
+        y = array[:,0]
+        # Makes x-ticks for the graph from the second item in the array_tuple (a list of headers) 
+        plt.xticks(x, headers, rotation = 30)
+        # 
+        e = array[:,1]
+        plt.ylabel(str(self.name), fontweight="bold")
+        plt.xlabel("Materials", fontweight="bold")
+        plt.ylim(float(max_min[0]),float(max_min[1]))
+        plt.xlim(min(x)-0.2*len(x),max(x)+0.2*len(x))
+        plt.grid(linestyle='dashed')
+        return plt.errorbar(x, y, yerr=e, fmt = "o", capsize=2)
 
 
 class PropertyValues():
@@ -123,20 +142,6 @@ def add_thing(thing_class,thing_list):
         return False
     else:
         return True
-
-
-def make_graph(array,prprty,max_min):
-    "Makes an error bar graph based on the array and other parameters supplied."
-    x = np.arange(1,len(array[0][:,0])+1)
-    y = array[0][:,0] 
-    plt.xticks(x, array[1], rotation = 30)
-    e = array[0][:,1]
-    plt.ylabel(str(prprty), fontweight="bold")
-    plt.xlabel("Materials", fontweight="bold")
-    plt.ylim(float(max_min[0]),float(max_min[1]))
-    plt.xlim(min(x)-0.2*len(x),max(x)+0.2*len(x))
-    plt.grid(linestyle='dashed')
-    return plt.errorbar(x, y, yerr=e, fmt = "o", capsize=2)
 
 def only_num(string):
     "Checks whether a user input is a numeric value, if not, loops around the specified previous question."
@@ -226,7 +231,7 @@ if __name__ == '__main__':
                 within_limits = True
                 #adds a material to the property with the avg and std dev values specified
                 prprty.add_a_material(mat,avg,std_dev)
-        plot = make_graph(prprty.gen_array(), prprty, max_min)
+        plot = prprty.make_graph(max_min)
 
         # Makes a new file name based on the string of the property
         new_file_name = str(prprty) + "-differential-scales"
@@ -242,18 +247,22 @@ if __name__ == '__main__':
             print("semantic-differential-scales directory not found. Making a new directory")
             print("...")
             os.makedirs(the_path.new_folder)
+            print("Done!")
             if os.path.exists(the_path.new_folder):
                 print("Directory successfuly made")
 
         print("Saving a semantic differential scale graph for " + str(prprty) + " as " + the_file_png )
         print("...")
         plt.savefig(the_path.safe_file_path(the_file_png), dpi = 300, bbox_inches ="tight")
+        print("Done!")
         plt.clf()
 
         no_headers = np.insert(prprty.gen_array()[0].astype(str), 0, prprty.gen_array()[1], 1 )
         print("Saving a CSV file of semantic differential data for " + str(prprty) + " as " + the_file_csv )
         print("...")
         np.savetxt(the_path.safe_file_path(the_file_csv), np.insert(no_headers, 0, the_headers, 0), fmt="%s", delimiter= ",")
+        print("Done!")
+
         print("Your graph and CSV file have been saved in " + the_path.new_folder)
     print("Your materials are " + str(material_list))
     print("Your properties are " + str(property_list))
