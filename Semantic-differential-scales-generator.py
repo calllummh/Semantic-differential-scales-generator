@@ -21,7 +21,7 @@ class Property():
         "Instantiates a property."
         self.name = name
         self.materials = {}
-
+        self.headers = ["Material", "Average", "Standard Deviation"]
     def __repr__(self):
         return str(self.name)
 
@@ -34,12 +34,12 @@ class Property():
     def gen_array(self):
         "Generates the array of data for numpy to make graphs for that property."
         array_list = []
-        header_list = []
+        material_list = []
         # Iterates over the materials in the materials list
         for mat in self.materials.keys():
             # Creates an array_row list and appends the material to it
             array_row = []
-            header_list.append(mat)
+            material_list.append(mat)
             # Iterates over the values for avg and std deviation for each material
             for value in self.materials[mat]:
                 # Appends the values to the array row
@@ -47,26 +47,34 @@ class Property():
             # Appends the row to the list, for each material.
             array_list.append(array_row)
         # Returns a generated array from the array list, and the header list. 
-        return np.array(array_list), header_list
+        return np.array(array_list), material_list
         
     def make_graph(self,max_min):
         "Makes an error bar graph based on the array and other parameters supplied."
-        array = self.gen_array()[0]
-        headers = self.gen_array()[1]
+        data = self.gen_array()[0]
+        mat_names = self.gen_array()[1]
         # Generates a range of x values for each value in first column of the array
-        x = np.arange(1,len(array[:,0])+1)
-        # Assigns y to equal the first column of the first item in the array tuple
-        y = array[:,0]
-        # Makes x-ticks for the graph from the second item in the array_tuple (a list of headers) 
-        plt.xticks(x, headers, rotation = 30)
-        # 
-        e = array[:,1]
+        x = np.arange(1,len(data[:,0])+1)
+        # Assigns y to equal the first column data array
+        y = data[:,0]
+        # Makes x-ticks for the graph from the mat_headers
+        plt.xticks(x, mat_names, rotation = 30)
+        # Adds error bars from the second coulmn of the data array
+        e = data[:,1]
         plt.ylabel(str(self.name), fontweight="bold")
         plt.xlabel("Materials", fontweight="bold")
         plt.ylim(float(max_min[0]),float(max_min[1]))
         plt.xlim(min(x)-0.2*len(x),max(x)+0.2*len(x))
         plt.grid(linestyle='dashed')
         return plt.errorbar(x, y, yerr=e, fmt = "o", capsize=2)
+    
+    def gen_csv(self, file_path):
+        "Method to generate a CSV file for the property."
+        data = self.gen_array()[0]
+        mat_names = self.gen_array()[1]
+        no_headers = np.insert(data.astype(str), 0, mat_names, 1 )
+        csv_array = np.insert(no_headers, 0, self.headers, 0)
+        return np.savetxt(file_path, csv_array, fmt="%s", delimiter= ",")
 
 
 class PropertyValues():
@@ -82,7 +90,6 @@ class FilePath():
     "Class for generating safe file paths and names."
     def __init__(self, new_folder_name, file_name):
         self.safe_file_name = self.make_name_safe(str(file_name))
-
         self.new_folder = os.path.join(os.getcwd(), new_folder_name)
     
     def make_name_safe(self,file_name):
@@ -195,6 +202,9 @@ if __name__ == '__main__':
             adding_properties = False
             adding_values = True
     #Adding values to the properties and the materials.
+        
+    print("Your materials are " + str(material_list))
+    print("Your properties are " + str(property_list))
     #Iterates over the list of properties
     for prprty in property_list:
         #iterates over the list of materials for each property
@@ -260,9 +270,8 @@ if __name__ == '__main__':
         no_headers = np.insert(prprty.gen_array()[0].astype(str), 0, prprty.gen_array()[1], 1 )
         print("Saving a CSV file of semantic differential data for " + str(prprty) + " as " + the_file_csv )
         print("...")
-        np.savetxt(the_path.safe_file_path(the_file_csv), np.insert(no_headers, 0, the_headers, 0), fmt="%s", delimiter= ",")
+        prprty.gen_csv(the_path.safe_file_path(the_file_csv))
+        # np.savetxt(the_path.safe_file_path(the_file_csv), np.insert(no_headers, 0, the_headers, 0), fmt="%s", delimiter= ",")
         print("Done!")
 
         print("Your graph and CSV file have been saved in " + the_path.new_folder)
-    print("Your materials are " + str(material_list))
-    print("Your properties are " + str(property_list))
