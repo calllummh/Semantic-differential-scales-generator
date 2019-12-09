@@ -1,6 +1,13 @@
+# [Future versions]
+### To be added
+Adding functionality to import CSV files to read data.
+
+
 # [Unreleased]
-### Added
-Added functionality to import CSV files to read data.
+## 2019-12-09
+### Removed
+Removed mat_values method from Property, as it was obsolte, and was superseded by Property Values class.
+
 
 # V3.3
 ## 2019-12-09
