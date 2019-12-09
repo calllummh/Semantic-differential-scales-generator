@@ -134,7 +134,7 @@ def make_graph(array,prprty,max_min):
     "Makes an error bar graph based on the array and other parameters supplied."
     x = np.arange(1,len(array[0][:,0])+1)
     y = array[0][:,0] 
-    plt.xticks(x, array[1])
+    plt.xticks(x, array[1], rotation = 30)
     e = array[0][:,1]
     plt.ylabel(str(prprty), fontweight="bold")
     plt.xlabel("Materials", fontweight="bold")
